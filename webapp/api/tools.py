@@ -24,13 +24,6 @@ class TaskInfo:
     user: str
     verdict: str
     message: str
-    bp_list_info1: str
-    bp_list_info2: str
-    bp_list_info3: str
-    bp_list_info4: str
-    bp_list_info5: str
-    bp_list_info6: str
-    bp_tasks_info: str
 
 
 @dataclass
@@ -50,7 +43,7 @@ def parse_post_data(raw_data, data_type="task"):
     Возвращаем соответственно TaskInfo или FileInfo
     """
 
-    if raw_data is str:
+    if type(raw_data) == str:
         data_decode = raw_data
     else:
         data_decode = raw_data.decode("utf8")
@@ -102,34 +95,20 @@ def load_task(task_info: TaskInfo):
     user = User.query.filter(User.user_name == task_info.user.lower()).first()
     if not user:
         user = User(user_name=task_info.user.lower(), full_user_name=task_info.user)
+        user.set_password(current_app.config["DEFAULT_PASS"])
         db.session.add(user)
 
     bp = BusinessProcess.query.filter(BusinessProcess.bp_id == task_info.bp_id).first()
     if bp:
         bp.title = task_info.bp_title
         bp.description = task_info.bp_description
-        bp.list_info1 = task_info.bp_list_info1
-        bp.list_info2 = task_info.bp_list_info2
-        bp.list_info3 = task_info.bp_list_info3
-        bp.list_info4 = task_info.bp_list_info4
-        bp.list_info5 = task_info.bp_list_info5
-        bp.list_info6 = task_info.bp_list_info6
-        bp.tasks_info = task_info.bp_tasks_info
     else:
         bp = BusinessProcess(
             bp_id=task_info.bp_id,
             bp_type=task_info.bp_type,
             title=task_info.bp_title,
             description=task_info.bp_description,
-            list_info1=task_info.bp_list_info1,
-            list_info2=task_info.bp_list_info2,
-            list_info3=task_info.bp_list_info3,
-            list_info4=task_info.bp_list_info4,
-            list_info5=task_info.bp_list_info5,
-            list_info6=task_info.bp_list_info6,
-            tasks_info=task_info.bp_tasks_info,
         )
-
     if not bp.date:
         bp.date = parse_date_from_string_and_convert_to_utc(task_info.bp_date)
 
