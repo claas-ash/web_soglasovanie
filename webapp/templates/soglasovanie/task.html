@@ -20,39 +20,30 @@
 	box-shadow: 0 0 0 0.2rem rgba(0,0,0,1);
 	}
 
-	.myDecline input[type=radio]:checked + label  {
-	color: #fff;
-	background-color: #ad0232;
-	border-color: black;
-	box-shadow: 0 0 0 0.2rem rgba(0,0,0,1);
-	}
+
+
 
 </style>
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script type="text/javascript">
-
-   $(document).ready(function() {
-    if ($("#declineRadio").is(":checked")) {
-        $("#messageBoxTitle").text("Укажите причину отклонения");
-    } else {
-        $("#messageBoxTitle").text("Укажите ваше замечание");
-    }
-
-    $("input:radio").on("change", function() {
-        if ($("#declineRadio").is(":checked")) {
-            $("#messageBoxTitle").text("Укажите причину отклонения");
-        } else {
-            $("#messageBoxTitle").text("Укажите ваше замечание");
-        }
-    });
-});
+    $( document ).ready(function() {
+        {% if form.verdict != 'mistake' %}
+            $("#messageBox").hide("display", "none");
+        {% endif %}
+        
+        $("input:radio").on("change", function(){
+            if ($("#declineRadio:input").prop("checked") || $("#mistakeRadio:input").prop("checked")){
+                    $("#messageBox").show(700);
+            }else{ $("#messageBox").hide(700);}
+            });
+        });
 </script>
 {% endblock %}
 
 {% block content %}
 
-{% if form.verdict and not validationError %}
+{% if form.verdict%}
 
 <div class="alert alert-dark" role="alert">
   Эта задача уже выполнена! Информация только для просмотра.
@@ -60,9 +51,7 @@
     {% if form.verdict == 'success'%}
     <span class='badge badge-success'>Согласовано</span>
   {% elif form.verdict == 'mistake'%}
-    <span class='badge badge-warning'>Отправлено замечание</span>
-  {% elif form.verdict == 'decline'%}
-    <span class='badge badge-danger'>Отклонено</span>
+    <span class='badge badge-warning'>Отклонено</span>
   {% else %}
     <span class='badge badge-danger'>{{form.verdict}}</span>
   {% endif %}
@@ -84,14 +73,6 @@
 
     {% include 'soglasovanie/bp_content_type_3.html' %}
 
-{% elif task.bp.bp_type == 'ТД_Обоснование' %}
-
-    {% include 'soglasovanie/bp_content_type_4.html' %}
-
-{% elif task.bp.bp_type == 'ТД_ЗакупочнаяПроцедура' %}
-
-    {% include 'soglasovanie/bp_content_type_5.html' %}
-
 {% endif %}
 
 <form method="POST" action="{{url_for('soglasovanie.perform_task')}}" >
@@ -99,16 +80,13 @@
 
     {% set checked_success = False %}
     {% set checked_mistake = False %}
-    {% set checked_decline = False %}
     {% set disabled_form = False %}
     {% if form.verdict == 'success' %}
         {% set checked_success = True %}
     {% elif form.verdict == 'mistake' %}
         {% set checked_mistake = True %}
-    {% elif form.verdict == 'decline' %}
-        {% set checked_decline = True %}
     {% endif %}
-    {% if form.verdict and not validationError %}
+    {% if form.verdict %}
         {% set disabled_form = True %}
     {% endif %}
 
@@ -137,32 +115,37 @@
                 </label>
             </div>
         </div>
-        {% if task.bp.bp_type == 'ТД_ЗакупочнаяПроцедура' %}
-        <div class="col-12 col-md-4">
-            <div class="form-check form-check-inline myDecline w-100">
-                <input class="form-check-input d-none" type="radio" name="verdict" id="declineRadio"
-                       value="decline"
-                       {% if checked_decline %} checked {% endif %}
-                       {% if disabled_form %} disabled {% endif %}
-                >
-                <label class="decline btn btn-danger text-white" for="declineRadio">
-                    Отклонить
-                </label>
-            </div>
-        </div>
-        {% endif %}
     </div>
 
     <div class="form-group" id="messageBox">
         <div>
-            {% if not disabled_form %}
-            <span id="messageBoxTitle">Укажите ваше замечание</span><br>
-            {% endif %}
+            <span style="color: red">Укажите ваше замечание</span><br>
             <textarea name="message" class="form-control" {% if disabled_form %} disabled {% endif %}>{% if form.message %}{{form.message}}{% endif %}</textarea>
 
         </div>
     </div>
-    
+
+    {% if is_admin %}
+
+    <div class="row">
+        <div class="col-12 col-md-8">
+              <div class="form-group">
+                <label for="admin_verdict">Установить статус для задачи:</label>
+                <select class="form-control" id="admin_verdict">
+                  <option>success</option>
+                  <option>mistake</option>
+                  <option>deleted</option>
+                  <option>finished</option>
+                  <option>removed_from_site</option>
+                </select>
+              </div>
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
     <button type="submit" class="btn btn-primary btn-block">Отправить</button>
 
 </form>

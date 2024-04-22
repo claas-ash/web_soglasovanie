@@ -8,12 +8,12 @@ class TaskForm(FlaskForm):
     bp_type = HiddenField("Вид бизнес процесса", validators=[DataRequired()])
     verdict = RadioField(
         "Решение",
-        choices=[("success", "Утвердить"), ("mistake", "Отправить замечание"), ("decline", "Отклонить")],
+        choices=[("success", "Утвердить"), ("mistake", "Отправить замечание")],
         render_kw={"class": "d-none"},
     )
     message = StringField("Замечание")
     submit = SubmitField("Отправить", render_kw={"class": "btn btn-primary"})
 
     def validate_message(self, message):
-        if self.verdict.data in ["mistake", "decline"] and not self.message.data:
+        if self.verdict.data == "mistake" and not self.message.data:
             raise ValidationError("Необходимо указать замечание!")

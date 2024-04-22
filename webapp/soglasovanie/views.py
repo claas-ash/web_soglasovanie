@@ -48,6 +48,7 @@ def index(task_filter: str = None):
         page_title=page_title,
         task_filter=task_filter,
         list_of_tasks=list_of_tasks,
+        is_admin=current_user.is_admin
     )
 
 
@@ -69,14 +70,11 @@ def show_task(task_id: str):
     except json.decoder.JSONDecodeError:
         bp_info = task.bp.description
 
-    tasks_info = json.loads(task.bp.tasks_info)
-
     bp_files = FileAttachment.query.filter(
         (FileAttachment.bp_id == task.bp_id) & (FileAttachment.file_type == "ВложениеБизнесПроцесса")
     )
     partner_files = FileAttachment.query.filter(
-        (FileAttachment.bp_id == task.bp_id) & (
-                    (FileAttachment.file_type == "УставнойДокумент") | (FileAttachment.file_type == "ФайлПобедителя"))
+        (FileAttachment.bp_id == task.bp_id) & (FileAttachment.file_type == "УставнойДокумент")
     )
     bp_reports = FileAttachment.query.filter(
         (FileAttachment.bp_id == task.bp_id) & (FileAttachment.file_type == "Отчет")
@@ -90,19 +88,16 @@ def show_task(task_id: str):
     if verdict_from_params:
         form.verdict = verdict_from_params
 
-    validation_error = request.args.get("validationError", False)
-
     return render_template(
         "soglasovanie/task.html",
         page_title=page_title,
         task=task,
         bp_info=bp_info,
-        tasks_info=tasks_info,
         bp_files=bp_files,
         bp_reports=bp_reports,
         partner_files=partner_files,
         form=form,
-        validationError=validation_error,
+        is_admin=current_user.is_admin,
     )
 
 
@@ -139,7 +134,6 @@ def perform_task():
                 "soglasovanie.show_task",
                 task_id=task_form.task_id.data,
                 verdict=task_form.verdict.data,
-                validationError=True
             )
         )
 
