@@ -106,7 +106,9 @@
     {% endfor %}
 
 </ul>
-
+<br>
+<a href="{{url_for('soglasovanie.get_file', file_id=file_info.file_id)}}"> {{file_info.filename}} </a>
+</br>
 <br>
 
 {% endif %}
