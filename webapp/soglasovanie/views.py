@@ -150,7 +150,7 @@ def get_file(file_id: int):
     return send_file(file.get_file_path(), attachment_filename=file.filename, as_attachment=True)
 
 
-@blueprint.route("/get_files/<str:bp_id>", methods=["GET"])
+@blueprint.route("/get_files/<bp_id>", methods=["GET"])
 @login_required
 def get_files(bp_id: str):
     """Выдать файлы бизнес-процесса"""
