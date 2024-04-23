@@ -148,3 +148,16 @@ def get_file(file_id: int):
         abort(404)
 
     return send_file(file.get_file_path(), attachment_filename=file.filename, as_attachment=True)
+
+
+@blueprint.route("/get_files/<bp_id>", methods=["GET"])
+@login_required
+def get_files(bp_id: str):
+    """Выдать файлы бизнес-процесса"""
+
+    bp_files = FileAttachment.query.filter(
+        (FileAttachment.bp_id == bp_id) & (FileAttachment.file_type == "ВложениеБизнесПроцесса"))
+    if not bp_files:
+        abort(404)
+
+    return send_file(bp_files.get_file_path(), attachment_filename=bp_files.filename, as_attachment=True)

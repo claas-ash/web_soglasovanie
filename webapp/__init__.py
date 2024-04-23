@@ -14,7 +14,8 @@ from webapp.user.views import blueprint as user_blueprint
 
 import logging
 
-logging.basicConfig(filename='error.log',level=logging.DEBUG)
+logging.basicConfig(filename='error.log', level=logging.DEBUG)
+
 
 def create_app():
     app = Flask(__name__)
