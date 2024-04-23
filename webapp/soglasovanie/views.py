@@ -153,7 +153,7 @@ def get_file(file_id: int):
 @blueprint.route("/get_files/<str:bp_id>", methods=["GET"])
 @login_required
 def get_files(bp_id: str):
-    """Выдать файл по его номеру в базе"""
+    """Выдать файлы бизнес-процесса"""
 
     bp_files = FileAttachment.query.filter(
         (FileAttachment.bp_id == task.bp_id) & (FileAttachment.file_type == "ВложениеБизнесПроцесса")
