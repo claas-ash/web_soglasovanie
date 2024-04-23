@@ -156,8 +156,7 @@ def get_files(bp_id: str):
     """Выдать файлы бизнес-процесса"""
 
     bp_files = FileAttachment.query.filter(
-        (FileAttachment.bp_id == task.bp_id) & (FileAttachment.file_type == "ВложениеБизнесПроцесса")
-
+        (FileAttachment.bp_id == bp_id) & (FileAttachment.file_type == "ВложениеБизнесПроцесса"))
     if not bp_files:
         abort(404)
 
